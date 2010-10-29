@@ -17,7 +17,7 @@ CGFloat kInputHeight = 40.0;
 
 @implementation SSMessagesViewController
 
-@synthesize tableView = _tableView;
+@synthesize tableView = _tableView, textField = _textField;
 
 #pragma mark NSObject
 
@@ -28,6 +28,7 @@ CGFloat kInputHeight = 40.0;
 
 - (void)dealloc {
 	[_tableView release];
+  [_textField release];
 	[_inputView release];
 	[_sendButton release];
 	[super dealloc];
@@ -36,7 +37,7 @@ CGFloat kInputHeight = 40.0;
 #pragma mark UITableViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if (self = [super initWithNibName:nil bundle:nil]) {
+  if (self = [super initWithNibName:nil bundle:nil]) {
 		self.view.backgroundColor = [UIColor colorWithRed:0.859 green:0.886 blue:0.929 alpha:1.0];
 		
 		// Table view
@@ -58,15 +59,14 @@ CGFloat kInputHeight = 40.0;
 		[self.view addSubview:_inputView];
 		
 		// Text field
-		SSTextField *textField = [[SSTextField alloc] initWithFrame:CGRectMake(6.0, 8.0, self.view.frame.size.width - 75.0, 27.0)];
-		textField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-		textField.background = [[UIImage imageNamed:@"images/SSMessagesViewControllerTextFieldBackground.png" bundle:@"SSToolkit.bundle"] stretchableImageWithLeftCapWidth:12 topCapHeight:0];
-		textField.delegate = self;
-		textField.font = [UIFont systemFontOfSize:15.0];
-		textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-		textField.textInsets = UIEdgeInsetsMake(0.0, 12.0, 0.0, 12.0);
-		[_inputView addSubview:textField];
-		[textField release];
+		_textField = [[SSTextField alloc] initWithFrame:CGRectMake(6.0, 8.0, self.view.frame.size.width - 75.0, 27.0)];
+		_textField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+		_textField.background = [[UIImage imageNamed:@"images/SSMessagesViewControllerTextFieldBackground.png" bundle:@"SSToolkit.bundle"] stretchableImageWithLeftCapWidth:12 topCapHeight:0];
+		_textField.delegate = self;
+		_textField.font = [UIFont systemFontOfSize:15.0];
+		_textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+		_textField.textInsets = UIEdgeInsetsMake(0.0, 12.0, 0.0, 12.0);
+		[_inputView addSubview:_textField];
 		
 		// Send button
 		_sendButton = [[UIButton buttonWithType:UIButtonTypeCustom] retain];
@@ -78,9 +78,10 @@ CGFloat kInputHeight = 40.0;
 		[_sendButton setTitle:@"Send" forState:UIControlStateNormal];
 		[_sendButton setTitleColor:[UIColor colorWithWhite:1.0 alpha:0.4] forState:UIControlStateNormal];
 		[_sendButton setTitleShadowColor:[UIColor colorWithRed:0.325 green:0.463 blue:0.675 alpha:1.0] forState:UIControlStateNormal];
+    [_sendButton addTarget:self action:@selector(addMessage) forControlEvents:UIControlEventTouchUpInside];
 		[_inputView addSubview:_sendButton];
-    }
-    return self;
+  }
+  return self;
 }
 
 #pragma mark SSMessagesViewController
@@ -99,28 +100,28 @@ CGFloat kInputHeight = 40.0;
 #pragma mark UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
+  return 1;
 }
 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 0;
+  return 0;
 }
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    static NSString *cellIdentifier = @"cellIdentifier";
-    
-    SSMessageTableViewCell *cell = (SSMessageTableViewCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if (cell == nil) {
-        cell = [[[SSMessageTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
-    }
+  
+  static NSString *cellIdentifier = @"cellIdentifier";
+  
+  SSMessageTableViewCell *cell = (SSMessageTableViewCell *)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+  if (cell == nil) {
+    cell = [[[SSMessageTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
+  }
 	
-    cell.messageStyle = [self messageStyleForRowAtIndexPath:indexPath];
+  cell.messageStyle = [self messageStyleForRowAtIndexPath:indexPath];
 	cell.messageText = [self textForRowAtIndexPath:indexPath];
 	
-    return cell;
+  return cell;
 }
 
 #pragma mark UITableViewDelegate
@@ -152,6 +153,22 @@ CGFloat kInputHeight = 40.0;
 	_inputView.frame = CGRectMake(0.0, _tableView.frame.size.height, self.view.frame.size.width, kInputHeight);
 	[_sendButton setTitleColor:[UIColor colorWithWhite:1.0 alpha:0.4] forState:UIControlStateNormal];
 	[UIView commitAnimations];
+}
+
+
+#pragma mark Send Button Action
+-(void)addMessage {
+  
+  [self.textField resignFirstResponder];
+  if ([self.textField.text length] > 0) {
+    [self updateMessages:self.textField.text];
+    self.textField.text = @"";
+  }
+}
+
+- (void) updateMessages:(NSString*)newMessage {
+  NSLog(@"Message sent was %@",newMessage);
+  NSLog(@"override this method to do something with the user entered text message");
 }
 
 @end
