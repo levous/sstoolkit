@@ -40,6 +40,7 @@ CGFloat kInputHeight = 40.0;
   if (self = [super initWithNibName:nil bundle:nil]) {
 		self.view.backgroundColor = [UIColor colorWithRed:0.859 green:0.886 blue:0.929 alpha:1.0];
 		
+    NSLog(@"Init of SSMessagingViewController");
 		// Table view
 		_tableView = [[UITableView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width, self.view.frame.size.height - kInputHeight) style:UITableViewStylePlain];
 		_tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
